@@ -82,7 +82,7 @@ def check_surf_unique(directory):
         print("All surfaces are unique")
 
 # read in bulk cell and convert to primitve
-bulk = read('Li7La3Zr2O12.cif')
+bulk = read('./input_files/Li7La3Zr2O12.cif')
 #bulk = read('Fe2O3_3.cif')
 prim_spglib=find_primitive(bulk)
 prim=Atoms(scaled_positions=prim_spglib[1], cell=prim_spglib[0], numbers=prim_spglib[2])
