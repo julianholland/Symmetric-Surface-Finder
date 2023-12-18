@@ -16,7 +16,7 @@ v0.2.2 (2023/12/18)
 
 Change log
 + Added minimum thickness requirement
-+ Changed output 
++ Changed outpu
 
 Outstanding known bugs/issues
 - Unable to reconcile by hand determination or Tom's number of unique cuts (typically get significantly more) this likely means we are missing or generating too many surfaces
