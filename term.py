@@ -45,7 +45,7 @@ def find_smallest_sym_surface(surf, surface_layers, vacuum, position_accuracy):
     frac_unique_surfaces = unique_surfaces[mask]
     for i in range(len(frac_unique_surfaces)):
         mask = z_coords < frac_unique_surfaces[i]
-        new_surf = surf[mask]  
+        new_surf = surf[mask]
         new_surf.center()
         rotational_symmetry = get_symmetry(new_surf, symprec=1e-5)["rotations"]
         z_rotational_operations = np.stack(rotational_symmetry)
@@ -71,8 +71,8 @@ def permute_surface(bulk, miller_plane, dirname, minimum_thickness):
     position_accuracy = 4  # modify this depending on how accurate your atomic measurements are. A higher value generally gives more surfaces as less atoms lie on the 'same' z-plane
     surface_layers = 1
     nudge = 10 ** (-1 * position_accuracy)
-    dummy_surf, single_cell_z_length = make_surface(1 ,miller_plane, bulk, vacuum)
-    min_thick_w_buffer=minimum_thickness+(single_cell_z_length/2)
+    dummy_surf, single_cell_z_length = make_surface(1, miller_plane, bulk, vacuum)
+    min_thick_w_buffer = minimum_thickness + (single_cell_z_length / 2)
     while ((single_cell_z_length) * (surface_layers)) < min_thick_w_buffer:
         surf, single_cell_z_length = make_surface(
             thickness=(surface_layers + 2),
@@ -136,9 +136,7 @@ def permute_surface(bulk, miller_plane, dirname, minimum_thickness):
         write(filename, sym_surf)
     surf_list = glob(dirname + "/*.xyz")  # find all xyz files in a directory
     if len(surf_list) == 0:
-        print(
-            "Found no symmetric structures for this Miller plane.\n"
-        )    
+        print("Found no symmetric structures for this Miller plane.\n")
     else:
         print(
             "Found "
@@ -191,7 +189,7 @@ all_miller_planes = np.mgrid[
 allowed_miller_planes = np.delete(all_miller_planes, 0, 0)
 
 # Alternatively provide a list of desired Miller planes to generate surfaces for
-#allowed_miller_planes = [[1,0,0], [0,0,1], [2,1,0], [1,1,0]]
+# allowed_miller_planes = [[1,0,0], [0,0,1], [2,1,0], [1,1,0]]
 minimum_thickness = 10
 for miller_combo in allowed_miller_planes:
     dirname = (
