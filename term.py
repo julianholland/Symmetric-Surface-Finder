@@ -190,7 +190,7 @@ allowed_miller_planes = np.delete(all_miller_planes, 0, 0)
 
 # Alternatively provide a list of desired Miller planes to generate surfaces for
 # allowed_miller_planes = [[1,0,0], [0,0,1], [2,1,0], [1,1,0]]
-minimum_thickness = 0
+minimum_thickness = 8
 for miller_combo in allowed_miller_planes:
     dirname = (
         "./"
