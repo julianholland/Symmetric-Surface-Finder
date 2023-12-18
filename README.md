@@ -7,7 +7,11 @@ This code is meant to find symmetric surfaces for any given periodic crystal and
 To find a symmetric surface we create all possible cuts for a given Miller index and periodic crystal (automatically reduced to a primitive cell) within a single layer (where a layer represents the minimum size surface slab that contains sufficient information to replicate the bulk should it be repeated infinitely perpendicular to the direction that it was cut). For each cut a new slab is generated which is at least two layers thick. We then cut on the side opposite to our chosen cut and check for symmetry operations using spglib. Should any operation of our surface have a "-z" operator present then our surface is symmetric and we stop there and create our surface.
 
 ## Use
-We have provided several examples of crystals in the ".cif" format in the input files folder. However, in principle, any periodic crystal in a file format that ASE can read will work. Edit the "bulk=" line in term.py to point to your file.
+We have provided several examples of crystals in the ".cif" format in the input files folder. However, in principle, any periodic crystal in a file format that ASE can read will work. Edit the `bulk=` line in term.py to point to your file.
+
+The `minimum_thickness=` parameter can be tuned to any value thickness you desire. Setting it to 0 will give you the smallest possible layer that still contains all information to reproduce the bulk.
+
+`miller_max=` will generate all allowed Miller planes up to the value provided. E.g. `miller_max=2` will produce a list of Miller planes from \[0,0,1\] to \[2,2,2\]. Alternatively, you can provide a list of desired Miller planes in the `allowed_miller_planes=` variable directly.
 
 then simply call the following in your terminal `python term.py`
 
@@ -23,4 +27,4 @@ Here are the packages required and their respective versions that we have used t
 
 ## Acknowledgement
 
-Tom Demeyere was instrumental in getting this code working although he may not approve of some of the code quirks.
+Tom Demeyere was instrumental in getting this code working although he may not approve of some of the code quirks. Dr. Felix Hanke had the original idea of the "-z" symmetry check.
