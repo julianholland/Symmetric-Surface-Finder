@@ -134,7 +134,7 @@ def permute_surface(bulk, miller_plane, dirname, minimum_thickness):
         if check_surf_unique(dirname, sym_surf) > 0:
             continue
         write(filename, sym_surf)
-    surf_list = glob(dirname + "/*.xyz")  # find all 
+    surf_list = glob(dirname + "/*.xyz")  # find all xyz files in a directory
     if len(surf_list) == 0:
         print(
             "Found no symmetric structures for this Miller plane.\n"
@@ -158,7 +158,7 @@ def permute_surface(bulk, miller_plane, dirname, minimum_thickness):
 
 def check_surf_unique(directory, surf):
     """Checks all surfaces in a given directory are unique"""
-    surf_list = glob(directory + "/*.xyz")  # find all
+    surf_list = glob(directory + "/*.xyz")  # find all xyz files in a directory
     if len(surf_list) == 0:
         return 0
     atoms_dir = [read(i) for i in surf_list]
@@ -175,23 +175,24 @@ def check_surf_unique(directory, surf):
     return 0
 
 
-# read in bulk cell and convert to primitve
+# Read in bulk cell and convert to primitve
 bulk = read("./input_files/Li7La3Zr2O12.cif")
-# bulk = read('Fe2O3_3.cif')
+
 prim_spglib = find_primitive(bulk)
 prim = Atoms(
     scaled_positions=prim_spglib[1], cell=prim_spglib[0], numbers=prim_spglib[2]
 )
 
-# generate all structures up to a given miller maximum
+# Generate all structures up to a given miller maximum
 miller_max = 2
 all_miller_planes = np.mgrid[
     0 : miller_max + 1, 0 : miller_max + 1, 0 : miller_max + 1
 ].T.reshape(-1, 3)
 allowed_miller_planes = np.delete(all_miller_planes, 0, 0)
 
+# Alternatively provide a list of desired Miller planes to generate surfaces for
 #allowed_miller_planes = [[1,0,0], [0,0,1], [2,1,0], [1,1,0]]
-minimum_thickness = 20
+minimum_thickness = 10
 for miller_combo in allowed_miller_planes:
     dirname = (
         "./"
