@@ -20,9 +20,19 @@ then simply call the following in your terminal `python term.py`
 Here are the packages required and their respective versions that we have used to test this code
 - python (v3.11.5)
 - ase (v3.22.1)
-- numpy (v1.26.2
+- numpy (v1.26.2)
 - spglib (v2.2.0)
 - tqdm (v4.66.1)
+
+
+## Outstanding known bugs/issues
+- Unable to reconcile by hand determination or Tom's number of unique cuts (typically get significantly more) this likely means we are missing or generating too many surfaces
+- different number of slabs produced depending on minimum thickness
+
+## Features to be implemented
++ Add an option to generate surfaces of multiple thicknesses in a single run for F+M
++ Add a means to check similarity between different miller planes (i.e. are these miller planes the same for this material) see felix's notes on that
++ Add feature to find what atoms are present on each surface
 
 
 ## Acknowledgement
