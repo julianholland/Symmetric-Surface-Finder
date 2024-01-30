@@ -12,14 +12,13 @@ from tqdm import tqdm
 """
 Description: A code to find all possible symmetric surfaces for a given bulk (periodic) crystal and a given miller plane
 Author: Julian Holland, Email: Julian.Holland@soton.ac.uk
-v0.2.3 (2024/01/03)
+v0.2.4 (2024/01/30)
 
 Change log
-+ Fixed minimum thickness parmameter so that no structures are produced smaller than it
-+ improved the variation in surfaces produced for different minimum thickness handily
++ Removed primitive structure finder as it was causing multiple issues and user now only needs to provide structures
++ Now reconciles with by hand calculations and with PyMatGen's symmetric surface finder
 
 Outstanding known bugs/issues
-- Unable to reconcile by hand determination or Tom's number of unique cuts (typically get significantly more) this likely means we are missing or generating too many surfaces
 - different number of slabs produced depending on minimum thickness
 
 Features to be implemented
@@ -68,14 +67,16 @@ def make_surface(thickness, miller_plane, bulk, vacuum):
 
 def permute_surface(bulk, miller_plane, dirname, minimum_thickness):
     """Permutes a given surface for all unique z-axis coordinates and creates an xyz file"""
-    vacuum = 10
+    vacuum = 40
     position_accuracy = 5  # modify this depending on how accurate your atomic measurements are. A higher value generally gives more surfaces as less atoms lie on the 'same' z-plane
     surface_layers = 0
     nudge = 10 ** (-1 * position_accuracy)
-    dummy_surf, single_cell_z_length = make_surface(1, miller_plane, bulk, vacuum) # get the single cell value with vacuum
+    dummy_surf, single_cell_z_length = make_surface(
+        1, miller_plane, bulk, vacuum
+    )  # get the single cell value with vacuum
     min_thick_w_buffer = minimum_thickness  # add a buffer to make it more likely that we don't go less than the desired minimum thickness
-    thickness_check=0
-    while thickness_check <= min_thick_w_buffer: # create a sufficiently thick surface
+    thickness_check = 0
+    while thickness_check <= min_thick_w_buffer:  # create a sufficiently thick surface
         surface_layers += 1
         surf, single_cell_z_length = make_surface(
             thickness=(surface_layers + 2),
@@ -83,8 +84,8 @@ def permute_surface(bulk, miller_plane, dirname, minimum_thickness):
             bulk=bulk,
             vacuum=vacuum,
         )
-        thickness_check = ((single_cell_z_length) * (surface_layers))
-        
+        thickness_check = (single_cell_z_length) * (surface_layers)
+
     z_coords = surf.positions[:, 2]  # create list of all z-coords
     unique_surfaces = np.unique(
         z_coords.round(decimals=position_accuracy)
@@ -106,7 +107,8 @@ def permute_surface(bulk, miller_plane, dirname, minimum_thickness):
             unique_surfaces[i] + nudge
         )  # define where we cut the surface on the left hand side
         ensure_thickness = int(
-            i + (((surface_layers + 2 - 1) / (surface_layers + 2) ) * len(unique_surfaces))
+            i
+            + (((surface_layers + 2 - 1) / (surface_layers + 2)) * len(unique_surfaces))
         )  # integer value of number of unique values required to maintain minimum thickness
         surf_term = (
             unique_surfaces[ensure_thickness] + nudge
@@ -154,15 +156,16 @@ def permute_surface(bulk, miller_plane, dirname, minimum_thickness):
             + " Angstrom thick ("
             + str(surface_layers)
             + " to "
-            + str(surface_layers + 1 )
+            + str(surface_layers + 1)
             + " layers thick)"
-            + "\n" 
+            + "\n"
         )
 
 
 def check_surf_unique(directory, surf, position_accuracy):
     """Checks all surfaces in a given directory are unique"""
-    symprec=1*10**-(position_accuracy)
+    # higher num of strucs potentially caused by not sorted spglib output might not be a good way to symmetry check
+    symprec = 1 * 10 ** -(position_accuracy)
     surf_list = glob(directory + "/*.xyz")  # find all xyz files in a directory
     if len(surf_list) == 0:
         return 0
@@ -183,21 +186,17 @@ def check_surf_unique(directory, surf, position_accuracy):
 # Read in bulk cell and convert to primitve
 bulk = read("./input_files/Li7La3Zr2O12.cif")
 
-prim_spglib = find_primitive(bulk)
-prim = Atoms(
-    scaled_positions=prim_spglib[1], cell=prim_spglib[0], numbers=prim_spglib[2]
-)
-
 # Generate all structures up to a given miller maximum
-miller_max = 2
+miller_max = 1
 all_miller_planes = np.mgrid[
     0 : miller_max + 1, 0 : miller_max + 1, 0 : miller_max + 1
 ].T.reshape(-1, 3)
 allowed_miller_planes = np.delete(all_miller_planes, 0, 0)
 
 # Alternatively provide a list of desired Miller planes to generate surfaces for
-#allowed_miller_planes = [[1,0,0]]
-minimum_thickness = 0 # This parameter will aim to create the smallest possible surface greater than the supplied value (will sometimes be slightly under due the way some surfaces are cut)
+allowed_miller_planes = [[0, 0, 1]]
+
+minimum_thickness = 0  # This parameter will aim to create the smallest possible surface greater than the supplied value (will sometimes be slightly under due the way some surfaces are cut)
 for miller_combo in allowed_miller_planes:
     dirname = (
         "./"
@@ -210,6 +209,6 @@ for miller_combo in allowed_miller_planes:
         + "/"
     )
     Path(dirname).mkdir(parents=True, exist_ok=True)
-    permute_surface(prim, miller_combo, dirname, minimum_thickness)
+    permute_surface(bulk, miller_combo, dirname, minimum_thickness)
 
-write("./surfaces/primitive_cell.xyz", prim)
+write("./surfaces/input_cell.xyz", bulk)
